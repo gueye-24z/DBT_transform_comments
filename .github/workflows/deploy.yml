@@ -3,7 +3,7 @@ name: DBT CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   # Job de Tests
