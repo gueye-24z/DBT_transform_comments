@@ -137,7 +137,8 @@ jobs:
       - name: Package code for Lambda
         run: |
           mkdir package
-          cp -r * package
+          shopt -s extglob  # Activer les globbing avancés pour exclure le dossier
+          cp -r !(package) package  # Copier tous les fichiers sauf le dossier 'package'
           cd package
           zip -r ../dbt_lambda_package.zip .
 
