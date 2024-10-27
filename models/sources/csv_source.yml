@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: csv_S3
-    database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+    database: \"${{ secrets.SNOWFLAKE_DATABASE }}\"
     schema: S3_CSV_RAW_DATA
     tables:
       - name: judgeme_reviews # Remplacez par le nom exact de la table
