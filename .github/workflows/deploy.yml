@@ -35,6 +35,14 @@ jobs:
             target: dev
           " > ~/.dbt/profiles.yml
 
+    
+      # Vérifiez la création de profiles.yml
+      - name: Verify profiles.yml
+        run: cat ~/.dbt/profiles.yml
+
+      - name: Test DBT Project Configuration
+        run: dbt debug
+
   # Job de Tests, dépendant de la préparation
   test:
     runs-on: ubuntu-latest
