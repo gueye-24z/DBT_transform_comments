@@ -24,66 +24,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Configurer le fichier profiles.yml avec les secrets et le paramètre threads
-      - name: Configure dbt profile
-        run: |
-          mkdir -p ~/.dbt
-          echo "
-          DBT_transform_comments:
-            outputs:
-              dev:
-                account: \"${{ secrets.SNOWFLAKE_ACCOUNT }}\"
-                user: \"${{ secrets.SNOWFLAKE_USER }}\"
-                password: \"${{ secrets.SNOWFLAKE_PASSWORD }}\"
-                role: \"${{ secrets.SNOWFLAKE_ROLE }}\"
-                database: \"${{ secrets.SNOWFLAKE_DATABASE }}\"
-                warehouse: \"${{ secrets.SNOWFLAKE_WAREHOUSE }}\"
-                schema: \"${{ secrets.SNOWFLAKE_SCHEMA }}\"
-                threads: 1
-                type: snowflake
-            target: dev
-          " > ~/.dbt/profiles.yml
-
-      # Vérifier que profiles.yml est bien créé et afficher son contenu
-      - name: Verify profiles.yml
-        run: |
-          echo "Listing contents of ~/.dbt directory:"
-          ls -la ~/.dbt
-          echo "Displaying contents of ~/.dbt/profiles.yml:"
-          cat ~/.dbt/profiles.yml
-
+      # Utilisation du fichier profiles.yml existant avec --profiles-dir
       - name: Test DBT Project Configuration
-        run: dbt debug
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
-          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+        run: dbt debug --profiles-dir ./.dbt  # Spécifie le répertoire du fichier profiles.yml existant
 
       - name: Compile DBT Project
-        run: dbt compile
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
-          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+        run: dbt compile --profiles-dir ./.dbt
 
       - name: Run DBT tests
-        run: dbt test
-        env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
-          SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-          SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+        run: dbt test --profiles-dir ./.dbt
 
       - name: Run pytest tests
         run: pytest tests/unit
@@ -107,33 +56,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Configurer le fichier profiles.yml pour le déploiement aussi
-      - name: Configure dbt profile for deployment
-        run: |
-          mkdir -p ~/.dbt
-          echo "
-          DBT_transform_comments:
-            outputs:
-              dev:
-                account: \"${{ secrets.SNOWFLAKE_ACCOUNT }}\"
-                user: \"${{ secrets.SNOWFLAKE_USER }}\"
-                password: \"${{ secrets.SNOWFLAKE_PASSWORD }}\"
-                role: \"${{ secrets.SNOWFLAKE_ROLE }}\"
-                database: \"${{ secrets.SNOWFLAKE_DATABASE }}\"
-                warehouse: \"${{ secrets.SNOWFLAKE_WAREHOUSE }}\"
-                schema: \"${{ secrets.SNOWFLAKE_SCHEMA }}\"
-                threads: 1
-                type: snowflake
-            target: dev
-          " > ~/.dbt/profiles.yml
-
-      - name: Verify profiles.yml for deployment
-        run: |
-          echo "Listing contents of ~/.dbt directory for deployment:"
-          ls -la ~/.dbt
-          echo "Displaying contents of ~/.dbt/profiles.yml for deployment:"
-          cat ~/.dbt/profiles.yml
-
+      # Utiliser également le fichier profiles.yml existant pour le déploiement
       - name: Package code for Lambda
         run: |
           mkdir package
@@ -148,11 +71,12 @@ jobs:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: eu-west-3  
-  
+
       - name: Deploy to AWS Lambda
         run: |
           aws lambda update-function-code \
             --function-name dbt_runner_lambda \
             --zip-file fileb://dbt_lambda_package.zip
+
 
 
