@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: judge_me
     database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
-    schema: JUDGEME_RAW_DATA
+    schema: 
     tables:
       - name: reviews
 
