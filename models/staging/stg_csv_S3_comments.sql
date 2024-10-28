@@ -11,7 +11,7 @@ with raw_data as (
         REVIEW_TEXT as review_text,
         REVIEW_DATE as review_date,
         AUTHOR_TITLE as author
-    from {{ source('csv_S3', 'judgeme_reviews') }}
+    from {{ source('csv_S3', 'csv_ingestion_from_S3') }}
     
     {% if is_incremental() %}
         -- Filtrer pour récupérer uniquement les nouvelles données basées sur `REVIEW_ID`
