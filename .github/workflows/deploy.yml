@@ -83,7 +83,7 @@ jobs:
       # Utiliser également le fichier profiles.yml existant pour le déploiement
       - name: Préparer le package Lambda
         run: |
-          rsync -av --exclude='dbt_lambda_package' ./* dbt_lambda_package/
+          rsync -av --exclude='dbt_lambda_package' ./ dbt_lambda_package/
           cd dbt_lambda_package
           zip -r -9 ../dbt_lambda_package.zip .
 
