@@ -81,13 +81,11 @@ jobs:
           pip install -r requirements.txt
 
       # Utiliser également le fichier profiles.yml existant pour le déploiement
-      - name: Package code for Lambda
+      - name: Préparer le package Lambda
         run: |
-          mkdir package
-          shopt -s extglob  # Activer les globbing avancés pour exclure le dossier
-          cp -r !(package) package  # Copier tous les fichiers sauf le dossier 'package'
-          cd package
-          zip -r ../dbt_lambda_package.zip .
+          rsync -av --exclude='dbt_lambda_package' ./* dbt_lambda_package/
+          cd dbt_lambda_package
+          zip -r -9 ../dbt_lambda_package.zip .
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
